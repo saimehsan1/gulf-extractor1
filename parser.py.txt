@@ -1,0 +1,31 @@
+import pytesseract, fitz, re
+from PIL import Image
+from ocr_utils import *
+
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text += page.get_text()
+    return text
+
+def extract_text_from_image(image_path):
+    return pytesseract.image_to_string(Image.open(image_path))
+
+def extract_data_from_files(files):
+    text = ""
+    for f in files:
+        if f.lower().endswith(".pdf"):
+            text += extract_text_from_pdf(f)
+        else:
+            text += extract_text_from_image(f)
+
+    name = re.search(r"Name\s*[:\-]?\s*(.+)", text)
+    passport = re.search(r"Passport\s*No\.?\s*[:\-]?\s*(\w+)", text)
+    dob = re.search(r"Date\s*of\s*Birth\s*[:\-]?\s*(.+)", text)
+
+    return [
+        name.group(1).strip() if name else "",
+        passport.group(1).strip() if passport else "",
+        dob.group(1).strip() if dob else "",
+    ]

@@ -1,0 +1,52 @@
+import sys, os
+from PyQt5 import QtWidgets, QtGui, QtCore
+from parser import extract_data_from_files
+from excel_writer import append_to_excel
+
+class ExtractorApp(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Gulf Overseas Technical Services – Data Extractor")
+        self.setWindowIcon(QtGui.QIcon("logo.ico"))
+        self.setStyleSheet("background-color: #1e1e1e; color: white; font-size: 14px;")
+        self.resize(800, 500)
+        layout = QtWidgets.QVBoxLayout()
+
+        # Logo
+        logo = QtWidgets.QLabel()
+        pixmap = QtGui.QPixmap("logo.png").scaled(150, 150, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        logo.setPixmap(pixmap)
+        logo.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(logo)
+
+        # File selector
+        self.file_btn = QtWidgets.QPushButton("📂 Select Document(s)")
+        self.file_btn.clicked.connect(self.select_files)
+        layout.addWidget(self.file_btn)
+
+        # Log
+        self.log = QtWidgets.QTextEdit()
+        self.log.setReadOnly(True)
+        layout.addWidget(self.log)
+
+        self.setLayout(layout)
+
+    def select_files(self):
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select Files", "", "Documents (*.pdf *.jpg *.png *.jpeg)")
+        if files:
+            self.process_files(files)
+
+    def process_files(self, files):
+        self.log.append(f"Processing {len(files)} file(s)...")
+        try:
+            row = extract_data_from_files(files)
+            append_to_excel("GULF_master.xlsx", row)
+            self.log.append("✅ Data extracted and appended to Excel.")
+        except Exception as e:
+            self.log.append(f"❌ Error: {e}")
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    win = ExtractorApp()
+    win.show()
+    sys.exit(app.exec_())

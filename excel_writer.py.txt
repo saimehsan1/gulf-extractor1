@@ -1,0 +1,14 @@
+import openpyxl
+import os
+
+def append_to_excel(filename, row):
+    if not os.path.exists(filename):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(["Full Name", "Passport No", "Date of Birth"])
+        wb.save(filename)
+
+    wb = openpyxl.load_workbook(filename)
+    ws = wb.active
+    ws.append(row)
+    wb.save(filename)

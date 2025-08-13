@@ -1,0 +1,17 @@
+gulf_extractor_final/
+│
+├── app.py
+├── parser.py
+├── excel_writer.py
+├── ocr_utils.py
+├── requirements.txt
+├── config.json
+├── GULF_master.xlsx
+├── logo.png
+├── logo.ico
+├── .gitignore
+├── README.md
+│
+└── .github/
+    └── workflows/
+        └── build.yml
