@@ -1,0 +1,31 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Install Tesseract
+        run: choco install tesseract --version=5.3.0.20221214
+
+      - name: Build EXE
+        run: pyinstaller --onefile --add-data "Tesseract-OCR;Tesseract-OCR" --icon=logo.ico app.py --name GULF_Overseas_Extractor
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GULF_Overseas_Extractor_with_Tesseract
+          path: dist/GULF_Overseas_Extractor.exe
